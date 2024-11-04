@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Checkout</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <form action="/checkout" method="POST" id="payment-form">
+    <div id="card-element"></div>
+    <button id="submit">Pay</button>
+  </form>
+
+  <script>
+    const stripe = Stripe("{{ key }}");
+    const elements = stripe.elements();
+    const card = elements.create("card");
+    card.mount("#card-element");
+
+    const form = document.getElementById("payment-form");
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const { paymentMethod, error } = await stripe.createPaymentMethod("card", card);
+      if (error) {
+        console.error(error);
+      } else {
+        form.submit();
+      }
+    });
+  </script>
+</body>
+</html>
